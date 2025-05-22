@@ -137,7 +137,7 @@ instructionBtn.addEventListener("click", function () {
     "url('assets/images/count_down_background.webp')";
   setTimeout(function() { // Add a delay
     countdownSound.play(); // Play countdown sound
-  }, 500); // Delay in milliseconds (0.5 seconds)
+  }, 1000); // Delay in milliseconds (1 second)
   countDownTimer(); // Call the countdown timer function
 });
 
@@ -192,36 +192,65 @@ function congrats() {
     end.style.backgroundImage =
         "url('assets/images/congrats_page.webp')";
 
+    // Clear previous elements from 'end' div
+    while (end.firstChild) {
+        end.removeChild(end.firstChild);
+    }
+
     const container = document.createElement("div");
     container.classList.add("congrats-container");
+
+    // Add the completed puzzle image
+    const solvedPuzzleImage = document.createElement("img");
+    solvedPuzzleImage.src = "/assets/images/tile/9.webp"; // Updated to be root-relative
+    solvedPuzzleImage.alt = "Completed Puzzle";
+    solvedPuzzleImage.classList.add("completed-puzzle-image"); // For styling (optional)
+
+    // Debugging logs for image loading
+    console.log("Creating completed puzzle image element with src:", solvedPuzzleImage.src);
+    solvedPuzzleImage.onload = function() {
+        console.log("Completed puzzle image loaded successfully:", solvedPuzzleImage.src);
+        // Optional: You might want to ensure the image has some dimensions if CSS doesn't provide them
+        // e.g., if (!solvedPuzzleImage.style.width) solvedPuzzleImage.style.width = "300px"; 
+        // e.g., if (!solvedPuzzleImage.style.height) solvedPuzzleImage.style.height = "auto";
+    };
+    solvedPuzzleImage.onerror = function() {
+        console.error("Error loading completed puzzle image:", solvedPuzzleImage.src);
+    };
+
     const qr = document.createElement("img");
     qr.src = "assets/images/qr.png";
-    qr.alt = "Congratulations!";
+    qr.alt = "QR Code"; // Changed alt text for clarity
 
     const message = document.createElement("p");
     message.classList.add("congrats-message");
     message.textContent = "Congrats!";
+
     const scoreText = document.createElement("p");
     scoreText.classList.add("score-text");
-    scoreText.textContent = `${score}`;
+    scoreText.textContent = `${score}`; // score is currently hardcoded to 0
+
     const scoreLabel = document.createElement("p");
     scoreLabel.classList.add("score-label");
     scoreLabel.textContent = "Points scored: ";
+
     const finishbtn = document.createElement("button");
     finishbtn.textContent = "Finish";
     finishbtn.classList.add("finish-btn");
+
     const scan = document.createElement("p");
     scan.classList.add("scan");
     scan.textContent = "Scan to check in";
 
-
-
-  
-    container.appendChild(scoreText);
+    // Append elements to the container in the desired order
+    container.appendChild(solvedPuzzleImage); // Image first
     container.appendChild(scoreLabel);
+    container.appendChild(scoreText);
     container.appendChild(qr);
     container.appendChild(scan);
     container.appendChild(finishbtn);
+
+    // Append the main message and the container to the 'end' div
     end.appendChild(message);
     end.appendChild(container);
 
@@ -232,10 +261,12 @@ function congrats() {
             "url('assets/images/start.webp')";
         backgroundMusic.pause(); // Pause background music
         backgroundMusic.currentTime = 0; // Reset music to the beginning
+        // Clear the container and message from end div to prevent duplication on next congrats
+        while (end.firstChild) {
+            end.removeChild(end.firstChild);
+        }
         initGame();
     });
-
-
 }
 
 
