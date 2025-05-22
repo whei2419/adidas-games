@@ -76,6 +76,7 @@ var moveTile = function () {
       this.style.gridColumn = emptyCol.toString(); // move it horizontally
       emptyCol = tmpCol;
       movesNum++;
+      document.getElementById("tileMoveSound").play(); // Play tile move sound
     }
   } else if (emptyCol == thisCol) {
     if (
@@ -86,6 +87,7 @@ var moveTile = function () {
       this.style.gridRow = emptyRow.toString(); // move it vertically
       emptyRow = tmpRow;
       movesNum++;
+      document.getElementById("tileMoveSound").play(); // Play tile move sound
     }
   }
   movescell.innerHTML = movesNum; // update # of moves displayed
@@ -116,11 +118,16 @@ const game = document.getElementById("game");
 const countdownText = document.querySelector(".count-down-timer");
 const gameTimerDisplay = document.querySelector(".timer"); // Get the new timer element
 const tryAgain = document.getElementById("tryAgain");
+const tryAgainBtn = document.getElementById("tryAgainBtn");
+const end = document.getElementById("end");
+const backgroundMusic = document.getElementById("backgroundMusic");
+const countdownSound = document.getElementById("countdownSound");
 
 startbtn.addEventListener("click", function () {
   instructionBtn.classList.remove("hidden");
   startbtn.classList.add("hidden");
   start.style.backgroundImage = "url('assets/images/instruction.webp')";
+  backgroundMusic.play(); // Play background music
 });
 
 instructionBtn.addEventListener("click", function () {
@@ -128,7 +135,20 @@ instructionBtn.addEventListener("click", function () {
   countDown.classList.remove("hidden");
   start.style.backgroundImage =
     "url('assets/images/count_down_background.webp')";
+  setTimeout(function() { // Add a delay
+    countdownSound.play(); // Play countdown sound
+  }, 500); // Delay in milliseconds (0.5 seconds)
   countDownTimer(); // Call the countdown timer function
+});
+
+tryAgainBtn.addEventListener("click", function () {
+    //restart game
+    tryAgain.classList.add("hidden");
+    game.classList.remove("hidden");
+    game.style.backgroundImage =
+        "url('assets/images/count_down_background.webp')";
+    randomizePuzzle();
+    startGameTimer();
 });
 
 function initGame() {
@@ -147,7 +167,7 @@ function countDownTimer() {
       game.style.backgroundImage =
         "url('assets/images/count_down_background.webp')";
       randomizePuzzle();
-      startGameTimer(); 
+      startGameTimer();
     } else {
       countdownText.innerHTML = timeLeft;
       timeLeft--;
@@ -161,8 +181,61 @@ function showTryAgain() {
   tryAgain.style.backgroundImage =
     "url('assets/images/try_again.webp')";
 }
+
 function gameSuccess() {
   game.classList.add("hidden");
+}
+
+function congrats() {
+    game.classList.add("hidden");
+    end.classList.remove("hidden");
+    end.style.backgroundImage =
+        "url('assets/images/congrats_page.webp')";
+
+    const container = document.createElement("div");
+    container.classList.add("congrats-container");
+    const qr = document.createElement("img");
+    qr.src = "assets/images/qr.png";
+    qr.alt = "Congratulations!";
+
+    const message = document.createElement("p");
+    message.classList.add("congrats-message");
+    message.textContent = "Congrats!";
+    const scoreText = document.createElement("p");
+    scoreText.classList.add("score-text");
+    scoreText.textContent = `${score}`;
+    const scoreLabel = document.createElement("p");
+    scoreLabel.classList.add("score-label");
+    scoreLabel.textContent = "Points scored: ";
+    const finishbtn = document.createElement("button");
+    finishbtn.textContent = "Finish";
+    finishbtn.classList.add("finish-btn");
+    const scan = document.createElement("p");
+    scan.classList.add("scan");
+    scan.textContent = "Scan to check in";
+
+
+
+  
+    container.appendChild(scoreText);
+    container.appendChild(scoreLabel);
+    container.appendChild(qr);
+    container.appendChild(scan);
+    container.appendChild(finishbtn);
+    end.appendChild(message);
+    end.appendChild(container);
+
+    finishbtn.addEventListener("click", function () {
+        end.classList.add("hidden");
+        start.classList.remove("hidden");
+        start.style.backgroundImage =
+            "url('assets/images/start.webp')";
+        backgroundMusic.pause(); // Pause background music
+        backgroundMusic.currentTime = 0; // Reset music to the beginning
+        initGame();
+    });
+
+
 }
 
 
@@ -201,12 +274,10 @@ function startGameTimer() {
       setTimeout(() => {
 
         if (checkIfSolved()) {
-          alert("Congratulations! You solved the puzzle!");
+            congrats();
         } else {
-          alert("Game Over! Try again.");
           showTryAgain();
         }
-  
       }, 2000); 
     } else {
       gameTimerDisplay.innerHTML = gameTimeLeft;
