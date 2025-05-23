@@ -316,13 +316,6 @@ function congrats() {
     end.appendChild(container);
 
     finishbtn.addEventListener("click", function () {
-        if (gameTimerInterval) {
-            clearInterval(gameTimerInterval);
-        }
-        gameTimerDisplay.innerHTML = ""; // Reset timer display
-        gameTimerDisplay.classList.add("hidden"); // Hide timer display
-
-        removeCompletePuzzleImage(); // Remove the 9th tile
         end.classList.add("hidden");
         start.classList.remove("hidden");
         startbtn.classList.remove("hidden");         // Show Play Now button
