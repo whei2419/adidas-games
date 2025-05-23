@@ -11,12 +11,14 @@ var tile6 = document.getElementsByClassName("Tile Tile6")[0];
 var tile7 = document.getElementsByClassName("Tile Tile7")[0];
 var tile8 = document.getElementsByClassName("Tile Tile8")[0];
 
+var displayedEmptyTile = null; // To keep track of the 9th tile element
+
 // Assigning the positions of tiles.
-var emptyRow, emptyCol;
 // Run the option you need below:
 //------------------------------------------------------
 // Option 1. Random initial positions
 var randomizePuzzle = function () {
+  removeCompletePuzzleImage(); // Remove the 9th tile if it's displayed
   movesNum = 0;
   movescell.innerHTML = movesNum; // update # of moves displayed
   [emptyRow, emptyCol] = [2, 2]; // position of the empty cell
@@ -41,9 +43,9 @@ var randomizePuzzle = function () {
 //------------------------------------------------------
 // Option 2. Ordered initial positions (a solved puzzle)
 var solvePuzzle = function () {
+  removeCompletePuzzleImage(); // Remove if any previous one was shown
   movesNum = 0;
   movescell.innerHTML = movesNum; // update # of moves displayed
-  [emptyRow, emptyCol] = [3, 2]; // position of the empty cell
   tile1.style.gridRow = 1;
   tile1.style.gridColumn = 1;
   tile2.style.gridRow = 1;
@@ -59,9 +61,43 @@ var solvePuzzle = function () {
   tile7.style.gridRow = 3;
   tile7.style.gridColumn = 1;
   tile8.style.gridRow = 3;
-  tile8.style.gridColumn = 3;
+  tile8.style.gridColumn = 2; // Tile 8 position: (Row 3, Column 2)
+  [emptyRow, emptyCol] = [3, 3]; // Position of the empty cell for solved state is 3,3
+
+  displayCompletePuzzleImage(); // Show the 9th tile
 };
 //------------------------------------------------------
+
+// Function to display the 9th tile (completed puzzle image)
+function displayCompletePuzzleImage() {
+  if (displayedEmptyTile) { // If one already exists, remove it first
+    removeCompletePuzzleImage();
+  }
+  const puzzleContainer = document.querySelector(".SlidingPuzzle");
+  if (!puzzleContainer) return;
+
+  const emptyCellLi = document.createElement("li");
+  emptyCellLi.classList.add("Tile", "EmptyTileDisplay"); // Add a specific class for easy removal
+  // Ensure emptyRow and emptyCol are correctly set for the solved state (e.g., 3,3)
+  emptyCellLi.style.gridRow = emptyRow.toString();
+  emptyCellLi.style.gridColumn = emptyCol.toString();
+
+  const img = document.createElement("img");
+  img.src = "/assets/images/tile/9.webp"; 
+  img.alt = "Final puzzle piece";
+
+  emptyCellLi.appendChild(img);
+  puzzleContainer.appendChild(emptyCellLi);
+  displayedEmptyTile = emptyCellLi;
+}
+
+// Function to remove the displayed 9th tile
+function removeCompletePuzzleImage() {
+  if (displayedEmptyTile && displayedEmptyTile.parentNode) {
+    displayedEmptyTile.parentNode.removeChild(displayedEmptyTile);
+  }
+  displayedEmptyTile = null;
+}
 
 var moveTile = function () {
   thisRow = this.style.gridRow.charAt(0);
@@ -91,6 +127,15 @@ var moveTile = function () {
     }
   }
   movescell.innerHTML = movesNum; // update # of moves displayed
+
+  // check if the puzzle is solved
+  if (checkIfSolved()) {
+    displayCompletePuzzleImage(); // Show the 9th tile
+    gameSuccess();
+    setTimeout(() => {
+      congrats();
+    }, 2000);
+  }
 };
 
 tile1.onclick = moveTile;
@@ -107,7 +152,7 @@ document.getElementById("solveit").onclick = solvePuzzle;
 
 randomizePuzzle();
 
-const timerInSeconds = 15;
+const timerInSeconds = 60;
 const countdownInseconds = 3;
 const score = 0;
 const start = document.getElementById("start");
@@ -183,7 +228,8 @@ function showTryAgain() {
 }
 
 function gameSuccess() {
-  game.classList.add("hidden");
+  // game.classList.add("hidden"); // Don't hide the game board immediately
+  console.log("Game success, puzzle solved!");
 }
 
 function congrats() {
@@ -199,24 +245,6 @@ function congrats() {
 
     const container = document.createElement("div");
     container.classList.add("congrats-container");
-
-    // Add the completed puzzle image
-    const solvedPuzzleImage = document.createElement("img");
-    solvedPuzzleImage.src = "/assets/images/tile/9.webp"; // Updated to be root-relative
-    solvedPuzzleImage.alt = "Completed Puzzle";
-    solvedPuzzleImage.classList.add("completed-puzzle-image"); // For styling (optional)
-
-    // Debugging logs for image loading
-    console.log("Creating completed puzzle image element with src:", solvedPuzzleImage.src);
-    solvedPuzzleImage.onload = function() {
-        console.log("Completed puzzle image loaded successfully:", solvedPuzzleImage.src);
-        // Optional: You might want to ensure the image has some dimensions if CSS doesn't provide them
-        // e.g., if (!solvedPuzzleImage.style.width) solvedPuzzleImage.style.width = "300px"; 
-        // e.g., if (!solvedPuzzleImage.style.height) solvedPuzzleImage.style.height = "auto";
-    };
-    solvedPuzzleImage.onerror = function() {
-        console.error("Error loading completed puzzle image:", solvedPuzzleImage.src);
-    };
 
     const qr = document.createElement("img");
     qr.src = "assets/images/qr.png";
@@ -255,6 +283,7 @@ function congrats() {
     end.appendChild(container);
 
     finishbtn.addEventListener("click", function () {
+        removeCompletePuzzleImage(); // Remove the 9th tile
         end.classList.add("hidden");
         start.classList.remove("hidden");
         start.style.backgroundImage =
@@ -271,26 +300,38 @@ function congrats() {
 
 
 function checkIfSolved() {
+  console.log("Checking solved state:");
+  console.log("Tile 1:", tile1.style.gridRow, tile1.style.gridColumn);
+  console.log("Tile 2:", tile2.style.gridRow, tile2.style.gridColumn);
+  console.log("Tile 3:", tile3.style.gridRow, tile3.style.gridColumn);
+  console.log("Tile 4:", tile4.style.gridRow, tile4.style.gridColumn);
+  console.log("Tile 5:", tile5.style.gridRow, tile5.style.gridColumn);
+  console.log("Tile 6:", tile6.style.gridRow, tile6.style.gridColumn);
+  console.log("Tile 7:", tile7.style.gridRow, tile7.style.gridColumn);
+  console.log("Tile 8:", tile8.style.gridRow, tile8.style.gridColumn);
+
   if (
-    tile1.style.gridRow == 1 &&
-    tile1.style.gridColumn == 1 &&
-    tile2.style.gridRow == 1 &&
-    tile2.style.gridColumn == 2 &&
-    tile3.style.gridRow == 1 &&
-    tile3.style.gridColumn == 3 &&
-    tile4.style.gridRow == 2 &&
-    tile4.style.gridColumn == 1 &&
-    tile5.style.gridRow == 2 &&
-    tile5.style.gridColumn == 2 &&
-    tile6.style.gridRow == 2 &&
-    tile6.style.gridColumn == 3 &&
-    tile7.style.gridRow == 3 &&
-    tile7.style.gridColumn == 1 &&
-    tile8.style.gridRow == 3 &&
-    tile8.style.gridColumn == 3
+    tile1.style.gridRow === "1" &&
+    tile1.style.gridColumn === "1" &&
+    tile2.style.gridRow === "1" &&
+    tile2.style.gridColumn === "2" &&
+    tile3.style.gridRow === "1" &&
+    tile3.style.gridColumn === "3" &&
+    tile4.style.gridRow === "2" &&
+    tile4.style.gridColumn === "1" &&
+    tile5.style.gridRow === "2" &&
+    tile5.style.gridColumn === "2" &&
+    tile6.style.gridRow === "2" &&
+    tile6.style.gridColumn === "3" &&
+    tile7.style.gridRow === "3" &&
+    tile7.style.gridColumn === "1" &&
+    tile8.style.gridRow === "3" &&
+    tile8.style.gridColumn === "2" // Updated to check for Tile 8 at (3,2)
   ) {
+   console.log("Puzzle is SOLVED");
    return true;
   } else {
+    console.log("Puzzle is NOT SOLVED");
     return false;
   }
 }
