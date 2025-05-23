@@ -275,6 +275,7 @@ function congrats() {
     container.classList.add("congrats-container");
 
     const qr = document.createElement("img");
+    qr.classList.add("qr-code");
     qr.src = "assets/images/qr.png";
     qr.alt = "QR Code"; // Changed alt text for clarity
 
