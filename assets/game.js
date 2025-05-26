@@ -111,7 +111,7 @@ function displayCompletePuzzleImage() {
   emptyCellLi.style.gridColumn = emptyCol.toString();
 
   const img = document.createElement("img");
-  img.src = "/assets/images/tile/9.webp"; 
+  img.src = "assets/images/tile/9.webp"; 
   img.alt = "Final puzzle piece";
 
   emptyCellLi.appendChild(img);
@@ -216,6 +216,7 @@ instructionBtn.addEventListener("click", function () {
 
 tryAgainBtn.addEventListener("click", function () {
     //restart game
+    location.reload();
     tryAgain.classList.add("hidden");
     game.classList.remove("hidden");
     game.style.backgroundImage =
@@ -317,6 +318,8 @@ function congrats() {
     end.appendChild(container);
 
     finishbtn.addEventListener("click", function () {
+    location.reload();
+
         end.classList.add("hidden");
         start.classList.remove("hidden");
         startbtn.classList.remove("hidden");         // Show Play Now button
