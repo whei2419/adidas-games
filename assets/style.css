@@ -175,14 +175,14 @@ button {
 
 #instructionBtn {
     position: absolute;
-    top: 1085px;
+    top: 1000px;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #tryAgainBtn {
     position: absolute;
-    top: 900px;
+    top: 1000px;
     left: 50%;
     transform: translate(-50%, -50%);
 }
