@@ -95,21 +95,20 @@ var setupPuzzleInSolvedState = function () {
   // DO NOT CALL displayCompletePuzzleImage() here
 };
 
-// New function for an "easiest" layout (3 moves to solve)
-var setupEasiestLayout = function () {
+// New function for the custom layout: empty, 2, 3, 1, 8, 4, 7, 5, 6
+var setupCustomLayout = function () {
   removeCompletePuzzleImage();
   movesNum = 0;
   movescell.innerHTML = movesNum;
-  tile1.style.gridRow = "1"; tile1.style.gridColumn = "1";
+  tile1.style.gridRow = "2"; tile1.style.gridColumn = "1";
   tile2.style.gridRow = "1"; tile2.style.gridColumn = "2";
   tile3.style.gridRow = "1"; tile3.style.gridColumn = "3";
-  tile4.style.gridRow = "2"; tile4.style.gridColumn = "1";
-  tile5.style.gridRow = "2"; tile5.style.gridColumn = "2";
-  // Tiles 6, 7, 8 are moved for the 3-move setup
-  tile8.style.gridRow = "2"; tile8.style.gridColumn = "3"; // Tile 8 from (3,2) to (2,3)
-  tile7.style.gridRow = "3"; tile7.style.gridColumn = "2"; // Tile 7 from (3,1) to (3,2)
-  tile6.style.gridRow = "3"; tile6.style.gridColumn = "3"; // Tile 6 from (2,3) to (3,3)
-  [emptyRow, emptyCol] = ["3", "1"]; // Empty is where tile 7 was originally (3,1)
+  tile4.style.gridRow = "2"; tile4.style.gridColumn = "3";
+  tile5.style.gridRow = "3"; tile5.style.gridColumn = "2";
+  tile6.style.gridRow = "3"; tile6.style.gridColumn = "3";
+  tile7.style.gridRow = "3"; tile7.style.gridColumn = "1";
+  tile8.style.gridRow = "2"; tile8.style.gridColumn = "2";
+  [emptyRow, emptyCol] = ["1", "1"]; // Empty is at (1,1)
   // DO NOT CALL displayCompletePuzzleImage() here
 };
 
@@ -200,10 +199,10 @@ tile6.onclick = moveTile;
 tile7.onclick = moveTile;
 tile8.addEventListener("click", moveTile); // alternative way to write it
 
-document.getElementById("newgame").onclick = setupEasiestLayout; // Changed to easiest layout
+document.getElementById("newgame").onclick = setupCustomLayout; // Changed to custom layout
 document.getElementById("solveit").onclick = showAndSolvePuzzle; // Stays as showAndSolvePuzzle
 
-setupEasiestLayout(); // Changed to easiest layout for initial setup
+setupCustomLayout(); // Changed to custom layout for initial setup
 
 const timerInSeconds = 60;
 const countdownInseconds = 3;
@@ -241,14 +240,14 @@ instructionBtn.addEventListener("click", function () {
 
 tryAgainBtn.addEventListener("click", function () {
     //restart game
-    location.reload(); // This will re-run setupEasiestLayout() on page load due to the call above.
-                     // If location.reload() is removed, ensure setupEasiestLayout() and startGameTimer() are called.
+    location.reload(); // This will re-run setupCustomLayout() on page load due to the call above.
+                     // If location.reload() is removed, ensure setupCustomLayout() and startGameTimer() are called.
     // The lines below are effectively not reached if location.reload() is active.
     // tryAgain.classList.add("hidden");
     // game.classList.remove("hidden");
     // game.style.backgroundImage =
     //     "url('assets/images/count_down_background.webp')";
-    // setupEasiestLayout(); 
+    // setupCustomLayout(); 
     // startGameTimer();
 });
 
@@ -267,7 +266,7 @@ function countDownTimer() {
       countDown.classList.add("hidden");
       game.style.backgroundImage =
         "url('assets/images/count_down_background.webp')";
-      setupEasiestLayout(); // Changed to easiest layout
+      setupCustomLayout(); // Changed to custom layout
       startGameTimer();
     } else {
       countdownText.innerHTML = timeLeft;
