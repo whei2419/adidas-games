@@ -70,29 +70,54 @@ function getMovableTiles() {
 
 //------------------------------------------------------
 // Option 2. Ordered initial positions (a solved puzzle)
-var solvePuzzle = function () {
+// Renamed from solvePuzzle, and without displaying the complete image initially
+var setupPuzzleInSolvedState = function () {
   removeCompletePuzzleImage(); // Remove if any previous one was shown
   movesNum = 0;
   movescell.innerHTML = movesNum; // update # of moves displayed
-  tile1.style.gridRow = 1;
-  tile1.style.gridColumn = 1;
-  tile2.style.gridRow = 1;
-  tile2.style.gridColumn = 2;
-  tile3.style.gridRow = 1;
-  tile3.style.gridColumn = 3;
-  tile4.style.gridRow = 2;
-  tile4.style.gridColumn = 1;
-  tile5.style.gridRow = 2;
-  tile5.style.gridColumn = 2;
-  tile6.style.gridRow = 2;
-  tile6.style.gridColumn = 3;
-  tile7.style.gridRow = 3;
-  tile7.style.gridColumn = 1;
-  tile8.style.gridRow = 3;
-  tile8.style.gridColumn = 2; // Tile 8 position: (Row 3, Column 2)
-  [emptyRow, emptyCol] = [3, 3]; // Position of the empty cell for solved state is 3,3
+  tile1.style.gridRow = "1";
+  tile1.style.gridColumn = "1";
+  tile2.style.gridRow = "1";
+  tile2.style.gridColumn = "2";
+  tile3.style.gridRow = "1";
+  tile3.style.gridColumn = "3";
+  tile4.style.gridRow = "2";
+  tile4.style.gridColumn = "1";
+  tile5.style.gridRow = "2";
+  tile5.style.gridColumn = "2";
+  tile6.style.gridRow = "2";
+  tile6.style.gridColumn = "3";
+  tile7.style.gridRow = "3";
+  tile7.style.gridColumn = "1";
+  tile8.style.gridRow = "3";
+  tile8.style.gridColumn = "2"; // Tile 8 position: (Row 3, Column 2)
+  [emptyRow, emptyCol] = ["3", "3"]; // Position of the empty cell for solved state is 3,3
+  // DO NOT CALL displayCompletePuzzleImage() here
+};
 
-  displayCompletePuzzleImage(); // Show the 9th tile
+// New function for an "easiest" layout (3 moves to solve)
+var setupEasiestLayout = function () {
+  removeCompletePuzzleImage();
+  movesNum = 0;
+  movescell.innerHTML = movesNum;
+  tile1.style.gridRow = "1"; tile1.style.gridColumn = "1";
+  tile2.style.gridRow = "1"; tile2.style.gridColumn = "2";
+  tile3.style.gridRow = "1"; tile3.style.gridColumn = "3";
+  tile4.style.gridRow = "2"; tile4.style.gridColumn = "1";
+  tile5.style.gridRow = "2"; tile5.style.gridColumn = "2";
+  // Tiles 6, 7, 8 are moved for the 3-move setup
+  tile8.style.gridRow = "2"; tile8.style.gridColumn = "3"; // Tile 8 from (3,2) to (2,3)
+  tile7.style.gridRow = "3"; tile7.style.gridColumn = "2"; // Tile 7 from (3,1) to (3,2)
+  tile6.style.gridRow = "3"; tile6.style.gridColumn = "3"; // Tile 6 from (2,3) to (3,3)
+  [emptyRow, emptyCol] = ["3", "1"]; // Empty is where tile 7 was originally (3,1)
+  // DO NOT CALL displayCompletePuzzleImage() here
+};
+
+// This function is for the "Solve It" button or similar actions
+// where the user explicitly wants to see the fully solved puzzle.
+var showAndSolvePuzzle = function() {
+  setupPuzzleInSolvedState(); // Set up the board
+  displayCompletePuzzleImage(); // Then show the 9th tile
 };
 //------------------------------------------------------
 
@@ -175,10 +200,10 @@ tile6.onclick = moveTile;
 tile7.onclick = moveTile;
 tile8.addEventListener("click", moveTile); // alternative way to write it
 
-document.getElementById("newgame").onclick = randomizePuzzle;
-document.getElementById("solveit").onclick = solvePuzzle;
+document.getElementById("newgame").onclick = setupEasiestLayout; // Changed to easiest layout
+document.getElementById("solveit").onclick = showAndSolvePuzzle; // Stays as showAndSolvePuzzle
 
-randomizePuzzle();
+setupEasiestLayout(); // Changed to easiest layout for initial setup
 
 const timerInSeconds = 60;
 const countdownInseconds = 3;
@@ -216,13 +241,15 @@ instructionBtn.addEventListener("click", function () {
 
 tryAgainBtn.addEventListener("click", function () {
     //restart game
-    location.reload();
-    tryAgain.classList.add("hidden");
-    game.classList.remove("hidden");
-    game.style.backgroundImage =
-        "url('assets/images/count_down_background.webp')";
-    randomizePuzzle();
-    startGameTimer();
+    location.reload(); // This will re-run setupEasiestLayout() on page load due to the call above.
+                     // If location.reload() is removed, ensure setupEasiestLayout() and startGameTimer() are called.
+    // The lines below are effectively not reached if location.reload() is active.
+    // tryAgain.classList.add("hidden");
+    // game.classList.remove("hidden");
+    // game.style.backgroundImage =
+    //     "url('assets/images/count_down_background.webp')";
+    // setupEasiestLayout(); 
+    // startGameTimer();
 });
 
 function initGame() {
@@ -240,7 +267,7 @@ function countDownTimer() {
       countDown.classList.add("hidden");
       game.style.backgroundImage =
         "url('assets/images/count_down_background.webp')";
-      randomizePuzzle();
+      setupEasiestLayout(); // Changed to easiest layout
       startGameTimer();
     } else {
       countdownText.innerHTML = timeLeft;
@@ -386,10 +413,14 @@ function startGameTimer() {
       clearInterval(gameTimerInterval);
       gameTimerDisplay.innerHTML = "Time's up!";
       setTimeout(() => {
-
         if (checkIfSolved()) {
-            congrats();
-        } else {
+            if (movesNum > 0) { // Player made moves and solved it
+                congrats();
+            } else {
+                // Puzzle is in solved state, but no moves were made.
+                showTryAgain(); 
+            }
+        } else { // Puzzle not solved
           showTryAgain();
         }
       }, 2000); 
