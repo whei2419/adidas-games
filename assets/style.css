@@ -168,21 +168,21 @@ button {
 
 #startbtn {
     position: absolute;
-    top: 900px;
+    top: 1138px;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #instructionBtn {
     position: absolute;
-    top: 1072px;
+top: 1513px;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #tryAgainBtn {
     position: absolute;
-    top: 1000px;
+    top: 1136px;
     left: 50%;
     transform: translate(-50%, -50%);
 }
